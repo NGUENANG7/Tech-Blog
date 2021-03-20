@@ -1,26 +1,22 @@
-
 {
-  "name": "tech-blog",
-  "version": "1.0.0",
-  "description": "A tech blog showcasing Model-View-Controller functionality",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NGUENANG7/Tech-Blog.git",
     "start": "node server.js"
   },
-  "keywords": [
-    "Tech-Blog"
-  ],
-  "author": "Gregory Nguenang",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/NGUENANG7/Tech-Blog/issues"
+  "name": "tech-blog",
+  "description": "Model-View-Controller (MVC) Tech Blog",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NGUENANG7/tech-blog.git"
   },
-  "homepage": "https://github.com/NGUENANG7/Tech-Blog#readme",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NGUENANG7/tech-blog/issues"
+  },
+  "homepage": "https://github.com/NGUENANG7/tech-blog#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "connect-session-sequelize": "^7.1.1",
@@ -28,8 +24,8 @@
     "express": "^4.17.1",
     "express-handlebars": "^5.2.1",
     "express-session": "^1.17.1",
-    "handlebars": "^4.7.7",
     "mysql2": "^2.2.5",
+    "nodemon": "^2.0.7",
     "sequelize": "^6.5.0"
   }
 }
