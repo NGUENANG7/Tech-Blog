@@ -1,100 +1,66 @@
 const router = require('express').Router();
-const { User, Blog, Comment } = require('../models');
+const { Comment, User, Post } = require('../models');
+// Import the custom middleware
 const withAuth = require('../utils/auth');
 
-router.get('/', async (req,res) => {
-  try{
-    res.redirect('/home');
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-router.get('/home', async (req, res) => {
+// GET all post for homepage
+router.get('/', async (req, res) => {
   try {
-    const dbBlogData = await Blog.findAll({
+    // Get all post and JOIN with user data
+    const dbPostsData = await Post.findAll({
       include: [
         {
           model: User,
-          attributes: ['name'],
         },
       ],
     });
 
-    const blogs = dbBlogData.map((blog) =>
-      blog.get({ plain: true })
-    );
-
-    res.render('home', {
-      blogs,
+    const posts = dbPostsData.map((posts) => posts.get({ plain: true }));
+    res.render('homepage', {
+      posts,
       loggedIn: req.session.loggedIn,
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });
 
+// GET one post
+// Use the custom middleware before allowing the user to access the post
 
-router.get('/dashboard', withAuth, async (req, res) => {
+router.get('/post/:id', async (req, res) => {
   try {
-    const userData = await User.findByPk(req.session.user_id, {
-      attributes: {exclude: ['password'] },
-      include: [{ model: Blog }],
-    });
-
-    const user = userData.get({ plain: true });
-
-    res.render('dashboard', {
-      ...user, 
-      loggedIn: true 
-    });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
- 
-router.get('/new-blog', withAuth, async (req, res) => {
-  try {
-    const userData = await User.findByPk(req.session.user_id, {
-      attributes: {exclude: ['password'] },
-      include: [{ model: Blog }],
-    });
-
-    const user = userData.get({ plain: true });
-    res.render('new-blog', {
-      ...user,
-      loggedIn: true 
-    });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-router.get('/blog/:id', async (req, res) => {
-  try {
-    const dbBlogData = await Blog.findByPk(req.params.id,{
+    const dbPostData = await Post.findByPk(req.params.id, {
       include: [
         {
           model: User,
-          attributes: ['name','id']
-        },{
-          model: Comment,
-          attributes: ['commenter_id', 'comment_text', 'date_created'],
-          include: [
-            {
-              model: User,
-              attributes: ['name']
-            }
-          ]
-        }
+        },
       ],
-  });
+    });
 
-    const blog = dbBlogData.get({ plain: true });
+    const post = dbPostData.get({ plain: true });
+    res.render('post', { post, loggedIn: req.session.loggedIn });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
 
-    res.render('blog', { 
-      ...blog, 
-      loggedIn: req.session.loggedIn 
+// Use withAuth middleware to prevent access to route
+router.get('/homepage', withAuth, async (req, res) => {
+  try {
+    // Find the logged in user based on the session ID
+    const userData = await User.findByPk(req.session.user_id, {
+      attributes: { exclude: ['password'] },
+      // include: [{ model: Post }],
+    });
+
+    const user = userData.get({ plain: true });
+
+    res.render('homepage', {
+      ...user,
+      logged_in: true,
     });
   } catch (err) {
     res.status(500).json(err);
@@ -102,12 +68,15 @@ router.get('/blog/:id', async (req, res) => {
 });
 
 router.get('/login', (req, res) => {
+  console.log('/login working');
+  // If the user is already logged in, redirect the request to another route
   if (req.session.loggedIn) {
-    res.redirect('/dashboard');
+    res.redirect('/');
     return;
   }
 
   res.render('login');
 });
+
 
 module.exports = router;

@@ -1,30 +1,46 @@
-async function commentFormHandler(event) {
+const newFormHandler = async (event) => {
   event.preventDefault();
 
-  const comment_text = document.querySelector('textarea[name="comment-body"]').value.trim();
+  const username = document.querySelector('#post-name').value.trim();
+  const description = document.querySelector('#post-desc').value.trim();
 
-  const post_id = window.location.toString().split('/')[
-    window.location.toString().split('/').length - 1
-  ];
+  if (username && description) {
+    const response = await fetch(`/api/post`, {
+      method: 'POST',
+      body: JSON.stringify({ title, body }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (comment_text) {
-      const response = await fetch('/api/comments', {
-        method: 'POST',
-        body: JSON.stringify({
-          post_id,
-          comment_text
-        }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-    
-      if (response.ok) {
-        document.location.reload();
-      } else {
-        alert(response.statusText);
-      }
+    if (response.ok) {
+      document.location.replace('/homepage');
+    } else {
+      alert('Failed to create post');
     }
-}
+  }
+};
 
-document.querySelector('.comment-form').addEventListener('submit', commentFormHandler);
+const delButtonHandler = async (event) => {
+  if (event.target.hasAttribute('data-id')) {
+    const id = event.target.getAttribute('data-id');
+
+    const response = await fetch(`/api/post/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      document.location.replace('/homepage');
+    } else {
+      alert('Failed to delete post');
+    }
+  }
+};
+
+document
+  .querySelector('.new-post-form')
+  .addEventListener('submit', newFormHandler);
+
+document
+  .querySelector('.post-list')
+  .addEventListener('click', delButtonHandler);

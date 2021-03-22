@@ -1,23 +1,15 @@
-<!-- displaying articles -->
-{{> post-info post}}
+{{!-- need for this to come up  --}}
 
-<!-- displaying form and comments-->
-<!-- only display if logged in -->
-{{#if loggedIn}}
-<form class="comment-form">
-  <div>
-    <textarea class="ml-5" name="comment-body"></textarea>
+<form>
+  <div class="form-group">
+    <label for="exampleFormControlInput1">Title</label>
+   <input class="form-control" id="titleForBlog"type="text" placeholder="Title">
   </div>
-
-  <div>
-    <button class="button is-warning ml-5 mb-5" type="submit">add comment</button>
+ 
+ 
+  <div class="form-group">
+    <label for="exampleFormControlTextarea1">Post</label>
+    <textarea class="form-control" id="postForBlog" rows="6"></textarea>
   </div>
-
 </form>
-{{/if}}
-
-{{> comments post.comments}}
-
-{{#if loggedIn}}
-<script src="/javascript/comment.js"></script>
-{{/if}}
+<button class="primary" id="addPost" >Add Post</button>

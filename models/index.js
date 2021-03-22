@@ -1,32 +1,39 @@
 const User = require('./User');
-const Blog = require('./Blog');
+const Post = require('./Post');
 const Comment = require('./Comment');
+// const Session = require('./Session');
 
-User.hasMany(Blog, {
-    foreignKey: 'user_id',
-    onDelete: 'CASCADE',
-});
+// realtionships alread created
+// User.hasMany(Post, {
+//   foreignKey: 'user_id',
+// });
 
-Blog.belongsTo(User, {
-    foreignKey: 'user_id',
-});
-
-Blog.hasMany(Comment, {
-    foreignKey: 'blog_id',
-    onDelete: 'CASCADE'
-});
-
-Comment.belongsTo(Blog, {
-    foreignKey: 'blog_id'
-});
-
-User.hasMany(Comment, {
-    foreignKey: 'commenter_id',
-    onDelete: 'CASCADE',
+Post.belongsTo(User, {
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 Comment.belongsTo(User, {
-    foreignKey: 'commenter_id',
-})
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 
-module.exports = { User, Blog, Comment };
+Comment.belongsTo(Post, {
+  foreignKey: 'post_id', //need post_id NOT text. dub
+});
+
+// realtionships alread created
+// Post.hasMany(Comment, {
+//   foreignKey: 'post_id',
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE',
+// });
+
+// Session.belongsTo(User, {
+//   foreignKey: 'sid',
+// });
+
+// tutor do not need it
+module.exports = { User, Post, Comment };

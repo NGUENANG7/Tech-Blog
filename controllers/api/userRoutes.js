@@ -1,161 +1,138 @@
 const router = require('express').Router();
-const { User, Post, Comment } = require('../../models');
+const { User, Post } = require('../../models');
 const withAuth = require('../../utils/auth');
 
-// GET /api/users
-router.get('/', (req, res) => {
-    // Access our User model and run .findAll() method
-    User.findAll({
-        attributes: { exclude: ['password'] }
-    })
-      .then(dbUserData => res.json(dbUserData))
-      .catch(err => {
-        console.log(err);
-        res.status(500).json(err);
+// CREATE new user
+router.post('/', async (req, res) => {
+  try {
+    //want different username. Will helped create 1 user validator
+    const userData = await User.findOne({
+      where: { username: req.body.username },
+    });
+    console.log(userData);
+    if (!userData) {
+      const dbUserData = await User.create({
+        username: req.body.username,
+        password: req.body.password,
       });
-  });
 
-// GET /api/users/1
-router.get('/:id', (req, res) => {
-    User.findOne({
-        attributes: { exclude: ['password']},
-        where: {
-          id: req.params.id
+      req.session.save(() => {
+        req.session.UserId = dbUserData.id;
+        req.session.loggedIn = true;
+
+        res.status(200).json(dbUserData);
+      });
+    } else {
+      res.status(409).json({ message: 'User Already Created' });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+});
+
+// Login
+router.post('/login', async (req, res) => {
+  try {
+    const dbUserData = await User.findOne({
+      where: {
+        username: req.body.username,
+      },
+    });
+
+    if (!dbUserData) {
+      res
+        .status(400)
+        .json({ message: 'Incorrect username or password. Please try again!' });
+      return;
+    }
+
+    const validPassword = await dbUserData.checkPassword(req.body.password);
+
+    if (!validPassword) {
+      res
+        .status(400)
+        .json({ message: 'Incorrect username or password. Please try again!' });
+      return;
+    }
+
+    req.session.save(() => {
+      req.session.userId = dbUserData.id;
+      req.session.loggedIn = true;
+
+      res
+        .status(200)
+        .json({ user: dbUserData, message: 'You are now logged in!' });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+});
+
+// Logout
+router.post('/logout', (req, res) => {
+  if (req.session.loggedIn) {
+    req.session.destroy(() => {
+      res.status(204).end();
+    });
+  } else {
+    res.status(404).end();
+    res.redirect('/login');
+  }
+});
+
+//used the project to help me get routes we worked on as a group.
+router.get('/', async (req, res) => {
+  try {
+    // Get all sessions and JOIN with user data
+    const dbUserData = await Post.findAll({
+      include: [
+        {
+          model: User,
         },
-        include: [
-            {
-              model: Post,
-              attributes: ['id', 'title', 'post_content', 'created_at']
-            },
-            {
-                model: Comment,
-                attributes: ['id', 'comment_text', 'created_at'],
-                include: {
-                  model: Post,
-                  attributes: ['title']
-                }
-            }
-          ]
-
-    })
-      .then(dbUserData => {
-        if (!dbUserData) {
-          res.status(404).json({ message: 'No user found with this id' });
-          return;
-        }
-        res.json(dbUserData);
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).json(err);
-      });
-  });
-
-// POST /api/users
-router.post('/', (req, res) => {
-    User.create({
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      twitter: req.body.twitter,
-      github: req.body.github
-    })
-    .then(dbUserData => {
-      req.session.save(() => {
-        req.session.user_id = dbUserData.id;
-        req.session.username = dbUserData.username;
-        req.session.twitter = dbUserData.twitter;
-        req.session.github = dbUserData.github;
-        req.session.loggedIn = true;
-    
-        res.json(dbUserData);
-      });
+      ],
     });
-  });
 
-  // LOGIN
-  router.post('/login', (req, res) => {
-    User.findOne({
-      where: {
-        email: req.body.email
-      }
-    }).then(dbUserData => {
-      if (!dbUserData) {
-        res.status(400).json({ message: 'No user with that email address!' });
-        return;
-      }
-  
-      const validPassword = dbUserData.checkPassword(req.body.password);
-  
-      if (!validPassword) {
-        res.status(400).json({ message: 'Incorrect password!' });
-        return;
-      }
-  
-      req.session.save(() => {
-        // declare session variables
-        req.session.user_id = dbUserData.id;
-        req.session.username = dbUserData.username;
-        req.session.twitter = dbUserData.twitter;
-        req.session.github = dbUserData.github;
-        req.session.loggedIn = true;
-  
-        res.json({ user: dbUserData, message: 'You are now logged in!' });
-      });
+    // Got from project. This is the serialize data so template can read it
+    const post = dbUserData.map((post) => post.get({ plain: true }));
+
+    res.render('homepage', {
+      post,
+      loggedIn: req.session.loggedIn,
     });
-  });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
 
+// Used from project. This uses withAuth middleware to prevent access to route
+router.get('/homepage', withAuth, async (req, res) => {
+  try {
+    const userData = await User.findByPk(req.session.userId, {
+      attributes: { exclude: ['password'] },
+    });
 
-  router.post('/logout', (req, res) => {
-    if (req.session.loggedIn) {
-      req.session.destroy(() => {
-        res.status(204).end();
-      });
-    }
-    else {
-      res.status(404).end();
-    }
-  });
+    const user = userData.get({ plain: true });
 
-// PUT /api/users/1
-router.put('/:id', withAuth, (req, res) => {
-    User.update(req.body, {
-        individualHooks: true,
-        where: {
-            id: req.params.id
-      }
-    })
-      .then(dbUserData => {
-        if (!dbUserData[0]) {
-          res.status(404).json({ message: 'No user found with this id' });
-          return;
-        }
-        res.json(dbUserData);
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).json(err);
-      });
-  });
+    res.render('homepage', {
+      ...user,
+      loggedIn: true,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
-// DELETE /api/users/1
-router.delete('/:id', withAuth, (req, res) => {
-    User.destroy({
-      where: {
-        id: req.params.id
-      }
-    })
-      .then(dbUserData => {
-        if (!dbUserData) {
-          res.status(404).json({ message: 'No user found with this id' });
-          return;
-        }
-        res.json(dbUserData);
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).json(err);
-      });
-  });
+router.get('/login', (req, res) => {
+  // If the user is already logged in, redirect the request to another route
+  if (req.session.loggedIn) {
+    res.redirect('/homepage');
+    return;
+  }
+
+  res.render('login');
+});
 
 module.exports = router;
