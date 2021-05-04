@@ -1,39 +1,7 @@
-<div class="row">
-  <div class="col-auto">
-    <h2>Welcome, to the Tech Blog {{username}}!</h2>
-  </div>
-</div>
+<article class="post">
 
-{{!-- {{#if logged_in}} --}}
- {{post.title}}
- {{post.body}}
+    {{#each posts as |post| }}
+        {{> post-info post}}
+    {{/each}}
 
-{{!-- _________________________________________________________________________________Old Post --}}
-{{!-- // Loop over each object in the projects array  --}}
-{{#each posts as |posts| }}
-<div class="row mb-4 project">
-  <div class="col-md-5">
-  
-    <p>Created by {{post.username}} on {{format_date post.date_created}}</p>
-  </div>
-  <form>
-  <div class="form-group">
-    <label for="exampleFormControlInput1">Title</label>
-   <input class="form-control" id="titleForBlog"type="text" placeholder="Title">
-  </div>
-  {{post.title}}
- 
- 
-  <div class="form-group">
-    <label for="exampleFormControlTextarea1">Post</label>
-    <textarea class="form-control" id="postForBlog" rows="6"></textarea>
-  </div>
-</form>
-<button class="primary" id="addPost" >Add Post</button>
-  <div class="col-md-7">
-    <p>
-      {{post.body}}
-    </p>
-  </div>
-</div>
-{{/each}} 
+</article>

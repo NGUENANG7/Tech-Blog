@@ -1,39 +1,32 @@
 const User = require('./User');
 const Post = require('./Post');
 const Comment = require('./Comment');
-// const Session = require('./Session');
 
-// realtionships alread created
-// User.hasMany(Post, {
-//   foreignKey: 'user_id',
-// });
-
+User.hasMany(Post, {
+    foreignKey: 'user_id'
+});
 Post.belongsTo(User, {
-  foreignKey: 'user_id',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
+    foreignKey: 'user_id',
+    onDelete: "cascade"
 });
 
 Comment.belongsTo(User, {
-  foreignKey: 'user_id',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
+    foreignKey: 'user_id',
+    onDelete: "cascade"
 });
 
 Comment.belongsTo(Post, {
-  foreignKey: 'post_id', //need post_id NOT text. dub
+    foreignKey: 'post_id',
+    onDelete: "cascade"
 });
 
-// realtionships alread created
-// Post.hasMany(Comment, {
-//   foreignKey: 'post_id',
-//   onDelete: 'CASCADE',
-//   onUpdate: 'CASCADE',
-// });
+User.hasMany(Comment, {
+    foreignKey: 'user_id',
+    onDelete: "cascade"
+});
 
-// Session.belongsTo(User, {
-//   foreignKey: 'sid',
-// });
-
-// tutor do not need it
+Post.hasMany(Comment, {
+    foreignKey: 'post_id',
+    onDelete: "cascade"
+})
 module.exports = { User, Post, Comment };

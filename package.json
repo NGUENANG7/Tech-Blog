@@ -1,37 +1,38 @@
 {
-  "name": "tech-blog",
+  "name": "the-tech-blog",
   "version": "1.0.0",
-  "description": "Built a CMS-style blog site similar to a Wordpress site, where developers can publish their blog posts and comment on other developer's posts as well. The app follows the MVC paradigm in its architectural structure, using Handlebars.js as the templating language, Sequelize as the ORM, and the express-session npm package for authentication.",
-  "main": "index.js",
+  "description": "tech-blog",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+      "test": "jest",
+      "start": "node server.js",
+      "watch": "nodemon server.js",
+      "seed": "node seeds/index.js"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NGUENANG7/Tech-Blog.git"
+      "type": "git",
+      "url": "git@github.com/NGUENANG7/Tech-Blog.git"
   },
-  "keywords": [],
   "author": "Gregory Nguenang",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/NGUENANG7/Tech-Blog/issues"
+      "url": "https://github.com/NGUENANG7/Tech-Blog/issues"
   },
   "homepage": "https://github.com/NGUENANG7/Tech-Blog#readme",
   "dependencies": {
-    "bcrypt": "^5.0.1",
-    "connect-session-sequelize": "^7.1.1",
-    "dotenv": "^8.2.0",
-    "eslint": "^7.22.0",
-    "express": "^4.17.1",
-    "express-handlebars": "^5.2.1",
-    "express-session": "^1.17.1",
-    "mysql2": "^2.2.5",
-    "nodemon": "^2.0.7",
-    "sequelize": "^6.5.1"
+      "bcrypt": "^5.0.0",
+      "connect-session-sequelize": "^6.1.1",
+      "dotenv": "^8.2.0",
+      "express": "^4.17.1",
+      "express-handlebars": "^4.0.4",
+      "express-session": "^1.17.1",
+      "mysql2": "^2.1.0",
+      "sequelize": "^5.21.12"
   },
   "devDependencies": {
-    "eslint-config-prettier": "^8.1.0",
-    "prettier": "^2.2.1"
+      "jest": "^26.4.2",
+      "nodemon": "^2.0.4",
+      "eslint-config-prettier": "^8.1.0",
+      "prettier": "^2.2.1"
   }
 }
