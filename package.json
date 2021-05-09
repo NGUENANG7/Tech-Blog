@@ -1,5 +1,5 @@
 {
-  "name": "c",
+  "name": "the-tech-blogs",
   "version": "1.0.0",
   "description": "tech-blog",
   "main": "server.js",
@@ -30,9 +30,7 @@
     "sequelize": "^5.21.12"
   },
   "devDependencies": {
-    "eslint-config-prettier": "^8.1.0",
     "jest": "^26.4.2",
-    "nodemon": "^2.0.4",
-    "prettier": "^2.2.1"
+    "nodemon": "^2.0.4"
   }
 }
